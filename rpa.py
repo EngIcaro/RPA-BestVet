@@ -4,29 +4,63 @@ from selenium.webdriver.common.keys import Keys
 import time,requests 
 #%%
 qtd_products = 5
-images_url = []
+web_driver_path = '/opt/WebDriver/bin/chromedriver'
+all_products = []
 #%%
-#Or use the context manager
-driver = Chrome(executable_path='/opt/WebDriver/bin/chromedriver')
+def set_up_chrome(web_driver_path):
+    driver = Chrome(executable_path=web_driver_path)
+    driver.maximize_window()
+    time.sleep(1)
+    
+    return driver
+
+
+def get_image_url(url_path):
+    element_url = driver.find_element_by_xpath(url_path)
+    text_url = element_url.get_attribute("src")
+    first_url = text_url[0:43]
+    aux_url = text_url[43:].split("/")
+    middle_url = aux_url[0]+'/large'
+    last_url = ""
+    for i in range (2, len(aux_url)):
+        last_url = "/" + aux_url[i]
+
+    return first_url+middle_url+last_url
+
+def append_new_product(name_xpath, initial_xpath, end_xpath, subscriber_xpath,url_path):
+    new_product = {}
+    new_product['name']             = driver.find_element_by_xpath(name_xpath).text
+
+    new_product['initial_value']    = driver.find_element_by_xpath(initial_xpath).text
+
+    new_product['end_value']        = driver.find_element_by_xpath(end_xpath).text
+
+    new_product['subscriber_value'] = driver.find_element_by_xpath(subscriber_xpath).text
+
+    new_product['url']              = get_image_url(url_path)
+
+    return new_product
+#%%
+
+driver = set_up_chrome(web_driver_path)
 driver.get("https://bestvet.petlove.com.br/cachorro?results_per_page="+str(qtd_products)+"&sort=8&page=1")
-driver.maximize_window()
-time.sleep(1)
-#elements = driver.find_elements_by_xpath('//div[@id="shelf-loop"]/div')
-#for item in elements:
-#    aux = item.find_element_by_xpath('//div/a[1]/h3')
-#    print(aux.text)
-element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[1]/h3')
-nome_produto = element_text.text
-print(element_text.text)
-element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[2]/div[1]/span')
-valor_inicial = element_text.text
-print(element_text.text)
-element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[2]/div[1]/div[2]')
-valor_final = element_text.text
-print(element_text.text)
-element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[2]/div[1]/div[3]')
-valor_assinantes = element_text.text
-print(element_text.text)
+
+for i in range(1, 5):
+    all_products.append(append_new_product('//*[@id="shelf-loop"]/div['+str(i)+']/div/a[1]/h3',
+                                           '//*[@id="shelf-loop"]/div['+str(i)+']/div/a[2]/div[1]/span',
+                                           '//*[@id="shelf-loop"]/div['+str(i)+']/div/a[2]/div[1]/div[2]',
+                                           '//*[@id="shelf-loop"]/div['+str(i)+']/div/a[2]/div[1]/div[3]',
+                                           '//*[@id="shelf-loop"]/div['+str(i)+']/a/div[1]/div/img'))
+
+
+
+
+
+
+
+
+
+#%%
 element_url = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/a/div[1]/div/img')
 text_url = element_url.get_attribute("src")
 full_url = ""
