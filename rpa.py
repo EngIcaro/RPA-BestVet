@@ -1,11 +1,54 @@
 #%%
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.keys import Keys
-import time 
+import time,requests 
 #%%
 qtd_products = 5
+images_url = []
 #%%
 #Or use the context manager
+driver = Chrome(executable_path='/opt/WebDriver/bin/chromedriver')
+driver.get("https://bestvet.petlove.com.br/cachorro?results_per_page="+str(qtd_products)+"&sort=8&page=1")
+driver.maximize_window()
+time.sleep(1)
+#elements = driver.find_elements_by_xpath('//div[@id="shelf-loop"]/div')
+#for item in elements:
+#    aux = item.find_element_by_xpath('//div/a[1]/h3')
+#    print(aux.text)
+element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[1]/h3')
+nome_produto = element_text.text
+print(element_text.text)
+element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[2]/div[1]/span')
+valor_inicial = element_text.text
+print(element_text.text)
+element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[2]/div[1]/div[2]')
+valor_final = element_text.text
+print(element_text.text)
+element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[2]/div[1]/div[3]')
+valor_assinantes = element_text.text
+print(element_text.text)
+element_url = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/a/div[1]/div/img')
+text_url = element_url.get_attribute("src")
+full_url = ""
+first_url = text_url[0:43]
+aux_url = text_url[43:].split("/")
+middle_url = aux_url[0]+'/large'
+last_url = ""
+for i in range (2, len(aux_url)):
+    last_url = "/" + aux_url[i]
+
+full_url = first_url+middle_url+last_url
+#%%
+reponse = requests.get(full_url)
+if reponse.status_code == 200:
+    with open(f"search{1}.jpg","wb") as file:
+        file.write(reponse.content)
+#%%
+# Texto  01: //*[@id="shelf-loop"]/div[1]/div/a[1]/h3
+# Texto  02: 
+# Imagem 01: 
+# Imagem 02: 
+#%%
 driver = Chrome(executable_path='/opt/WebDriver/bin/chromedriver')
 driver.get("https://bestvet.petlove.com.br/cachorro?results_per_page="+str(qtd_products)+"&sort=8&page=1")
 driver.maximize_window()
@@ -20,26 +63,10 @@ elements = driver.find_elements_by_xpath('//div[@id="shelf-loop"]/div')
 for item in elements:
     aux = item.find_element_by_xpath('//div/a[1]/h3')
     print(aux.text)
-#%%
-for i 5:
-element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[1]/h3')
-nome_produto = element_text.text
-print(element_text.text)
-element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[2]/div[1]/span')
-valor_inicial = element_text.text
-print(element_text.text)
-element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[2]/div[1]/div[2]')
-valor_final = element_text.text
-print(element_text.text)
-element_text = driver.find_element_by_xpath('//*[@id="shelf-loop"]/div[1]/div/a[2]/div[1]/div[3]')
-valor_assinantes = element_text.text
-print(element_text.text)
 
-#%%
-# Texto  01: //*[@id="shelf-loop"]/div[1]/div/a[1]/h3
-# Texto  02: 
-# Imagem 01: 
-# Imagem 02: 
+
+
+
 
 //*[@id="shelf-loop"]/div[1]/div/a[1]
 #%%
