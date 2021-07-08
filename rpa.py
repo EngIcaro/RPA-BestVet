@@ -1,6 +1,7 @@
 #%%
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 import time,requests 
 #%%
 qtd_products = 5
@@ -27,34 +28,42 @@ def get_image_url(url_path):
 
     return first_url+middle_url+last_url
 
-def append_new_product(name_xpath, initial_xpath, end_xpath, subscriber_xpath,url_path):
+def append_new_product(name_xpath, initial_xpath, end_xpath, subscriber_xpath,sale_xpath,url_path):
     new_product = {}
-    new_product['name']             = driver.find_element_by_xpath(name_xpath).text
+    
+    new_product['name']                 = driver.find_element_by_xpath(name_xpath).text
+    
+    try:
+        new_product['initial_value']    = driver.find_element_by_xpath(initial_xpath).text
+    except NoSuchElementException:
+        new_product['initial_value']    = "Não possui"
+    
+    new_product['end_value']            = driver.find_element_by_xpath(end_xpath).text
 
-    new_product['initial_value']    = driver.find_element_by_xpath(initial_xpath).text
+    new_product['subscriber_value']     = driver.find_element_by_xpath(subscriber_xpath).text
 
-    new_product['end_value']        = driver.find_element_by_xpath(end_xpath).text
+    try:
+        new_product['sale']             = driver.find_element_by_xpath(sale_xpath).text
+    except NoSuchElementException:
+        new_product['sale']             = "Não tem promoção"
 
-    new_product['subscriber_value'] = driver.find_element_by_xpath(subscriber_xpath).text
 
-    new_product['url']              = get_image_url(url_path)
+    new_product['url']                  = get_image_url(url_path)
 
     return new_product
 #%%
 
 driver = set_up_chrome(web_driver_path)
 driver.get("https://bestvet.petlove.com.br/cachorro?results_per_page="+str(qtd_products)+"&sort=8&page=1")
+time.sleep(1)
+for i in range(1, qtd_products+1):
 
-for i in range(1, 5):
     all_products.append(append_new_product('//*[@id="shelf-loop"]/div['+str(i)+']/div/a[1]/h3',
                                            '//*[@id="shelf-loop"]/div['+str(i)+']/div/a[2]/div[1]/span',
                                            '//*[@id="shelf-loop"]/div['+str(i)+']/div/a[2]/div[1]/div[2]',
                                            '//*[@id="shelf-loop"]/div['+str(i)+']/div/a[2]/div[1]/div[3]',
+                                           '//*[@id="shelf-loop"]/div['+str(i)+']/div/a[2]/div[1]/div[1]',
                                            '//*[@id="shelf-loop"]/div['+str(i)+']/a/div[1]/div/img'))
-
-
-
-
 
 
 
